@@ -1,0 +1,56 @@
+11.1
+with open('zoo.py', 'w') as file:
+    file.write("""
+def hours():
+    print('Open 9-5 daily')
+""")
+import importlib.util
+import sys
+spec = importlib.util.spec_from_file_location("zoo", "zoo.py")
+zoo = importlib.util.module_from_spec(spec)
+sys.modules["zoo"] = zoo
+spec.loader.exec_module(zoo)
+zoo.hours()
+
+11.2
+with open('zoo.py', 'w') as file:
+    file.write("""
+def hours():
+    print('Open 9-5 daily')
+""")
+import importlib.util
+import sys
+spec = importlib.util.spec_from_file_location("zoo", "zoo.py")
+zoo = importlib.util.module_from_spec(spec)
+sys.modules["zoo"] = zoo
+spec.loader.exec_module(zoo)
+menagerie = sys.modules["zoo"]
+menagerie.hours()
+
+16.8
+import sqlalchemy as db
+engine = db.create_engine('sqlite:///books.db')
+connection = engine.connect()
+metadata = db.MetaData()
+book_table = db.Table('book', metadata,
+                      db.Column('id', db.Integer, primary_key=True),
+                      db.Column('title', db.String))
+
+metadata.create_all(engine)
+
+connection.execute(book_table.insert(), [
+    {'title': 'The Great Gatsby'},
+    {'title': 'To Kill a Mockingbird'},
+    {'title': '1984'},
+    {'title': 'Pride and Prejudice'},
+    {'title': 'War and Peace'}
+])
+
+metadata.reflect(bind=engine)
+book_table = metadata.tables['book']
+query = db.select([book_table.c.title]).order_by(book_table.c.title)
+result_proxy = connection.execute(query)
+results = result_proxy.fetchall()
+for row in results:
+    print(row['title'])
+connection.close()
